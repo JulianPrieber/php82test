@@ -149,6 +149,9 @@ jobs:
           IMAGE_NAME=julianprieber/test
           VERSION=latest
 
+          setx DOCKER_BUILDKIT 1
+          setx COMPOSE_DOCKER_CLI_BUILD 1
+
           # Enable experimental features for Docker CLI
           export DOCKER_CLI_EXPERIMENTAL=enabled
 
