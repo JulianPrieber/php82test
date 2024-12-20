@@ -149,7 +149,7 @@ jobs:
         run: |
           # Set up the Docker image name and version
           IMAGE_NAME=julianprieber/test
-          VERSION=test
+          VERSION=latest
 
           # Enable experimental features for Docker CLI
           export DOCKER_CLI_EXPERIMENTAL=enabled
