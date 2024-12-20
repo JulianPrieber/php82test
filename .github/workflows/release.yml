@@ -52,7 +52,7 @@ jobs:
 
           cp "../../version.json" "version.json"
           
-          composer update --no-dev --no-scripts
+          composer update --no-scripts
 
           php artisan lang:update
           
@@ -60,6 +60,8 @@ jobs:
           php artisan db:seed
           php artisan db:seed --class="PageSeeder"
           php artisan db:seed --class="ButtonSeeder"
+
+          composer update --no-dev --no-scripts
           
           rm -r ".git"
           rm -r ".github"
