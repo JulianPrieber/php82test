@@ -39,7 +39,7 @@ jobs:
 
           echo "$version" > version.json
 
-          git clone https://github.com/LinkStackOrg/LinkStack/
+          git clone -b beta https://github.com/LinkStackOrg/LinkStack/
 
           mkdir linkstack
           mv LinkStack linkstack/linkstack
@@ -52,7 +52,7 @@ jobs:
 
           cp "../../version.json" "version.json"
           
-          composer update --no-scripts
+          composer update --no-dev --no-scripts
 
           php artisan lang:update
           
@@ -128,39 +128,4 @@ jobs:
 
             # Mark the release as the latest
             gh release edit "${GITHUB_REF##*/}" --title="${GITHUB_REF##*/}" -R "$REPO_NAME"
-          fi
-
-      - name: Update version.json
-        if: ${{ github.event_name == 'push' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        run: |
-          if [ -z "${GITHUB_TOKEN}" ]; then
-            echo "GitHub API key not found. Exiting..."
-            exit 1
-          else
-            # GitHub credentials
-            username="JulianPrieber"
-            token="${{ secrets.MY_GITHUB_TOKEN }}"
-
-            # The repository and file path
-            repo="LinkStackOrg/LinkStack"
-            file_path="version.json"
-
-            # Fetch the latest commit's SHA for the file
-            sha=$(curl -u "$username:$token" -s "https://api.github.com/repos/$repo/contents/$file_path" | grep -oP '(?<="sha": ")[^"]+')
-
-            # Get version from version.json
-            cd /tmp/linkstack
-            TAG_VERSION="${GITHUB_REF##*/}"
-            version=${TAG_VERSION#"v"}
-
-            # JSON payload with the new content
-            payload="{\"message\": \"Update version.json to $version\", \"content\": \"$(echo -ne "$version\n" | base64 -w 0)\", \"sha\": \"$sha\"}"
-
-            # API endpoint to create a new commit
-            url="https://api.github.com/repos/$repo/contents/$file_path"
-
-            # Make the API request to update the file
-            curl -X PUT -u "$username:$token" -d "$payload" "$url"
           fi
