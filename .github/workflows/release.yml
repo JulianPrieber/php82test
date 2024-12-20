@@ -131,7 +131,7 @@ jobs:
             # Mark the release as the latest
             gh release edit "${GITHUB_REF##*/}" --title="${GITHUB_REF##*/}" -R "$REPO_NAME"
           fi
-          
+
       - name: Setup Docker
         run: |
           sudo apt-get update
@@ -147,5 +147,31 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          # Replace with your Dockerfile path if necessary
-          sudo docker build -t your-image-name:$version .
+          # Set up the Docker image name and version
+          IMAGE_NAME=julianprieber/test
+          VERSION=test
+
+          # Enable experimental features for Docker CLI
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+
+          # Create and use a new Buildx builder instance
+          docker buildx create --name mybuilder --use
+          docker buildx inspect mybuilder --bootstrap
+
+          # Pull the LinkStack-docker repository
+          git clone https://github.com/LinkStackOrg/LinkStack-docker.git /tmp/linkstack-docker
+
+          # Navigate to the linkstack-docker folder
+          cd /tmp/linkstack-docker
+
+          # Remove the existing linkstack folder and paste the updated files from the previous steps
+          rm -rf linkstack
+          
+          # Copy the contents from the linkstack folder (generated from the Updating Dependencies + zip step)
+          cp -r /tmp/linkstack/linkstack linkstack
+
+          # Build the Docker image for multiple architectures and push to Docker Hub
+          docker buildx build \
+            --platform linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64 \
+            --tag $IMAGE_NAME:$VERSION \
+            --push .
