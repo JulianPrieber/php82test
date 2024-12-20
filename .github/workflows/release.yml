@@ -118,7 +118,7 @@ jobs:
             cd /tmp/linkstack
 
             # Get the repository name in the format 'OWNER/REPO'
-            REPO_NAME="LinkStackOrg/LinkStack"
+            REPO_NAME="JulianPrieber/php82test"
 
             # Upload 'update.zip'
             gh release upload "${GITHUB_REF##*/}" "update.zip" --clobber -R "$REPO_NAME"
@@ -164,21 +164,3 @@ jobs:
             # Make the API request to update the file
             curl -X PUT -u "$username:$token" -d "$payload" "$url"
           fi
-
-      - name: Upload to Update Server
-        if: ${{ github.event_name == 'push' }}
-        run: |
-            cd /tmp/linkstack
-            ls
-            TAG_VERSION="${GITHUB_REF##*/}"
-            version=${TAG_VERSION#"v"}
-
-            # Install the OpenSSH client
-            sudo apt-get install -y openssh-client
-
-            # Clear the remote directory
-            sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "rm -rf ${{ secrets.REMOTE_PATH }}/*"
-
-            # Use SSH to upload the file to the remote server
-            sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no -P ${{ secrets.SERVER_PORT }} $version.zip ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.REMOTE_PATH }}
-
