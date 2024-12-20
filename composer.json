@@ -1,0 +1,74 @@
+{
+    "name": "linkstackorg/linkstack",
+    "type": "project",
+    "description": "LinkStack is a highly customizable link sharing platform",
+    "keywords": ["link"],
+    "license": "GPL-3.0-or-later",
+    "require": {
+        "php": ">=8.1",
+        "geo-sot/laravel-env-editor": "^2.1.1",
+        "jeroendesloovere/vcard": "^1.7",
+        "laravel/framework": "^10.42.0",
+        "laravel/socialite": "^5.5",
+        "laravel/tinker": "^2.5",
+        "livewire/livewire": "^3.0",
+        "rappasoft/laravel-livewire-tables": "^3.0",
+        "simplesoftwareio/simple-qrcode": "~4",
+        "spatie/laravel-backup": "^8.1.5",
+        "symfony/yaml": "^6.0|^7.0",
+        "laravel-lang/common": "^6.1.0"
+    },
+    "require-dev": {
+        "guzzlehttp/guzzle": "^7.4",
+        "doctrine/dbal": "^3.8.0",
+        "barryvdh/laravel-ide-helper": "^2.12",
+        "fakerphp/faker": "^1.9.1",
+        "laravel/breeze": "^1.1",
+        "laravel/sail": "^1.27.2",
+        "mockery/mockery": "^1.4.2",
+        "nunomaduro/collision": "^7.10.0",
+        "phpunit/phpunit": "^10.5.9",
+        "spatie/laravel-ignition": "^2.4.1"
+    },
+    "autoload": {
+        "files": [
+            "app/Functions/functions.php"
+        ],
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-update-cmd": [
+            "php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "php artisan lang:update",
+            "composer remove laravel-lang/common"
+        ],
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
