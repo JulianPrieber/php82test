@@ -1,4 +1,4 @@
-name: Setup Ubuntu with Composer and PHP 8
+name: Setup Ubuntu with Composer and PHP
 on:
   push:
     tags:
@@ -28,7 +28,7 @@ jobs:
           HASH=`curl -sS https://composer.github.io/installer.sig`
           sudo php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
-          sudo update-alternatives --set php /usr/bin/php8.0
+          sudo update-alternatives --set php /usr/bin/php8.1
 
           cd /tmp
           mkdir linkstack
