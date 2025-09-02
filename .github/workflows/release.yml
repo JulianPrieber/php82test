@@ -132,44 +132,48 @@ jobs:
             gh release edit "${GITHUB_REF##*/}" --title="${GITHUB_REF##*/}" -R "$REPO_NAME"
           fi
 
-      - name: Setup Docker
+      # --- New Docker build/push flow starts here ---
+
+      # We need the dockerfile context under /tmp/linkstack-docker,
+      # so clone and copy the freshly prepared app folder just like before.
+      - name: Prepare Docker build context
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-
-      - name: Build Docker Image
-        if: ${{ github.event_name == 'push' }}
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
-        run: |
-          echo $DOCKER_ACCESS_TOKEN | docker login -u $DOCKER_USERNAME --password-stdin
-
-          # Set up the Docker image name and version
-          IMAGE_NAME=julianprieber/test
-          VERSION=latest
-
-          # Enable experimental features for Docker CLI
-          export DOCKER_CLI_EXPERIMENTAL=enabled
-
-          # Create and use a new Buildx builder instance
-          docker buildx create --name mybuilder --use
-          docker buildx inspect mybuilder --bootstrap
-
-          # Pull the LinkStack-docker repository
           git clone https://github.com/LinkStackOrg/LinkStack-docker.git /tmp/linkstack-docker
+          rm -rf /tmp/linkstack-docker/linkstack
+          cp -r /tmp/linkstack/linkstack /tmp/linkstack-docker/linkstack
 
-          # Navigate to the linkstack-docker folder
-          cd /tmp/linkstack-docker
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-          # Remove the existing linkstack folder and paste the updated files from the previous steps
-          rm -rf linkstack
-          
-          # Copy the contents from the linkstack folder (generated from the Updating Dependencies + zip step)
-          cp -r /tmp/linkstack/linkstack linkstack
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
 
-          # Build the Docker image for multiple architectures and push to Docker Hub
-          docker buildx build \
-            --platform linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64 \
-            --tag $IMAGE_NAME:$VERSION \
-            --push .
+      - name: Prepare Docker tags
+        id: prep
+        run: |
+          IMAGE="julianprieber/test"
+          TAGS="$IMAGE:latest"
+          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
+
+      - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: /tmp/linkstack-docker
+          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.prep.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
