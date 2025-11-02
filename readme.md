@@ -54,6 +54,8 @@
 
 Looking for the best Laravel-based URL shortener? We've conducted comprehensive research:
 
+> **🎯 [Start with the Documentation Index →](INDEX.md)**
+
 <table>
 <tr>
 <td width="33%">
