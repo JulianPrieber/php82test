@@ -50,6 +50,13 @@
 
 ---
 
+> **📚 Research Documents**: Looking for URL shortener options? Check out our comprehensive research:
+> - [Laravel Link Shorteners Research](LARAVEL_LINK_SHORTENERS.md) - Detailed analysis of available solutions
+> - [Quick Reference Guide](QUICK_REFERENCE.md) - Fast comparison and recommendations
+> - [Implementation Guide](URL_SHORTENER_IMPLEMENTATION.md) - How to add URL shortening to LinkStack
+
+---
+
 <a name="Function"></a>
 ## Function
 
