@@ -152,7 +152,7 @@ jobs:
       - name: Prepare Docker tags
         id: prep
         run: |
-          IMAGE="julianprieber/test"
+          IMAGE="linkstackorg/linkstack"
           TAGS="$IMAGE:latest"
           echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
 
